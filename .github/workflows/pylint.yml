@@ -41,7 +41,7 @@ jobs:
 
       - name: Run dprint
         run: |
-          dprint fmt
+          /home/runner/.dprint/bin/dprint fmt
 
       # Commits the changes back to your branch only if files were modified
       - name: Commit changes
