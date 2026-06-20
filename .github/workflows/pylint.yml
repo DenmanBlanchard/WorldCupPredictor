@@ -1,25 +1,29 @@
-name: Ruff
+name: Auto-Fix Code Style
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  build:
+  auto-fix:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-        cache: ''
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install ruff
-    - name: Analysing the code with ruff
-      run: |
-        ruff check --fix
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          # Required if you want to push commits back to the repo
+          token: ${{ secrets.GITHUB_TOKEN }} 
+
+      - name: Run Ruff Fixes
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "check --fix"
+
+      - name: Run Ruff Formatter
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "format"
+
+      # Commits the changes back to your branch only if files were modified
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: automated ruff fixes and formatting"
