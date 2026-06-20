@@ -35,6 +35,7 @@ def getData(url_end="competitions", unfold_goals=False):
     payload = {}
     headers = {
         "X-Auth-Token": api_key,
+        **({"X-Unfold-Goals": True} if unfold_goals else {}),
     }
 
     has_Called = False
@@ -62,6 +63,15 @@ def getData(url_end="competitions", unfold_goals=False):
                     time.sleep(61.0)
                     glb.last_minute = math.floor(time.time() / 60)
                     glb.current_calls = 0
+                elif (
+                    str(e).startswith("4")
+                    or str(e).startswith("3")
+                    or str(e).startswith("2")
+                    or str(e).startswith("1")
+                ):
+                    print(e)
+                    print(response.text)
+                    exit()
 
                 has_Called = False
 
@@ -70,6 +80,9 @@ def getData(url_end="competitions", unfold_goals=False):
 
 
 def main_parse():
-    for i in range(20):
-        getData("competitions/WC/matches")
-        print("Got data")
+    getTeams()
+
+    with open(os.path.join(os.path.abspath("data"), "teams.json"), "r") as file:
+        teams = json.load(file)
+        for team in teams["teams"]:
+            getMatches(team["id"])
