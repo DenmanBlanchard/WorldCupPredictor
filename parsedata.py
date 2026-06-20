@@ -12,7 +12,23 @@ load_dotenv()
 api_key = os.getenv("API_KEY")
 
 
-def getData(url_end="competitions"):
+def getTeams():
+    with open(os.path.join(os.path.abspath("data"), "teams.json"), "w") as file:
+        json.dump(getData("competitions/WC/teams?season=2026"), file, indent=4)
+
+
+def getMatches(teamid):
+    with open(
+        os.path.join(os.path.abspath("data\\teams"), f"{teamid}.json"), "w"
+    ) as file:
+        json.dump(
+            getData(f"teams/{teamid}/matches?season=2026&competitions=2000,"),
+            file,
+            indent=4,
+        )
+
+
+def getData(url_end="competitions", unfold_goals=False):
 
     url = "http://api.football-data.org/v4/"
 
@@ -34,7 +50,7 @@ def getData(url_end="competitions"):
 
                 if response.status_code == 200:
                     if response.text:
-                        return response.text
+                        return response.json()
                     else:
                         return {"Nothing"}
 
