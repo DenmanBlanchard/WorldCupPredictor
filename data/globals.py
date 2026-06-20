@@ -11,6 +11,7 @@ current_calls = 0
 
 last_minute = math.floor(time.time() / 60)
 
+
 def isAbleCall():
     global current_calls, last_minute
 

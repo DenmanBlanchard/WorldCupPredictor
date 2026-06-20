@@ -1,11 +1,9 @@
 import requests
-import pandas
-import json
 import os
 import time
 import math
 
-import data.globals as glb 
+import data.globals as glb
 
 from dotenv import load_dotenv
 
@@ -13,8 +11,9 @@ load_dotenv()
 
 api_key = os.getenv("API_KEY")
 
-def getData(url_end = "competitions"):
-    
+
+def getData(url_end="competitions"):
+
     url = "http://api.football-data.org/v4/"
 
     payload = {}
@@ -24,10 +23,12 @@ def getData(url_end = "competitions"):
 
     has_Called = False
 
-    while not(has_Called):
+    while not (has_Called):
         if glb.isAbleCall():
             try:
-                response = requests.request("GET", (url + url_end), headers=headers, data=payload)
+                response = requests.request(
+                    "GET", (url + url_end), headers=headers, data=payload
+                )
 
                 has_Called = True
 
@@ -53,7 +54,6 @@ def getData(url_end = "competitions"):
 
 
 def main_parse():
-    for i in range (20):
+    for i in range(20):
         getData("competitions/WC/matches")
         print("Got data")
-    
