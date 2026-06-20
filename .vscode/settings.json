@@ -1,17 +1,15 @@
 {
-    
   "[python]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.codeActionsOnSave": {
-        "source.organizeImports": "explicit",
-        "source.fixAll": "explicit"
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
     }
   },
 
-  "[json]" :{
+  "[json]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "gplane.dprint2"
   }
-
 }
