@@ -1,5 +1,5 @@
-import time
 import math
+import time
 
 global max_calls
 global current_calls
@@ -27,4 +27,14 @@ def isAbleCall():
         return True
 
     # reached max calls for this minute
+    sleep_time = (math.floor(time.time()) - (last_minute * 60)) + 1
+    print(
+        f"Waiting for {sleep_time} seconds",
+        end="",
+        flush=True,
+    )
+    time.sleep((math.floor(time.time()) - (last_minute * 60)) + 1)
+    print(
+        f"\r{'Getting data / Continuing. Waited for ' + str(sleep_time) + ' seconds':<70}"
+    )
     return False
