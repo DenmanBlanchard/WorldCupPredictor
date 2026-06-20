@@ -1,11 +1,12 @@
-import requests
+import json
+import math
 import os
 import time
-import math
+
+import requests
+from dotenv import load_dotenv
 
 import data.globals as glb
-
-from dotenv import load_dotenv
 
 load_dotenv()
 
