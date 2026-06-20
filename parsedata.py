@@ -19,14 +19,18 @@ def getTeams():
 
 
 def getMatches(teamid):
-    with open(
-        os.path.join(os.path.abspath("data"), "teams", f"{teamid}.json"), "w"
-    ) as file:
-        json.dump(
-            getData(f"teams/{teamid}/matches?season=2026&competitions=2000,"),
-            file,
-            indent=4,
-        )
+    try:
+        with open(
+            os.path.join(os.path.abspath("data"), "teams", f"{teamid}.json"), "w"
+        ) as file:
+            json.dump(
+                getData(f"teams/{teamid}/matches?season=2026&competitions=2000,"),
+                file,
+                indent=4,
+            )
+    except Exception:
+        os.mkdir(os.path.join("data", "teams"))
+        getMatches(teamid)
 
 
 def getData(url_end="competitions", unfold_goals=False):
