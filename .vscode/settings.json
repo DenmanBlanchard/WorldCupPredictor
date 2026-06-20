@@ -11,5 +11,6 @@
   "[json]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "gplane.dprint2"
-  }
+  },
+  "python.REPL.enableREPLSmartSend": false
 }
