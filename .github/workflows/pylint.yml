@@ -27,6 +27,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install ruff
+          curl -fsSL https://dprint.dev/install.sh | sh
 
       - name: Run Ruff Fixes
         uses: astral-sh/ruff-action@v3
@@ -37,6 +38,10 @@ jobs:
         uses: astral-sh/ruff-action@v3
         with:
           args: "format"
+
+      - name: Run dprint
+        run: |
+          /home/runner/.dprint/bin/dprint fmt
 
       # Commits the changes back to your branch only if files were modified
       - name: Commit changes
