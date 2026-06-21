@@ -18,7 +18,7 @@ def updateTeamElo(team1id, team2id=0, wld=0, init=False):
 
                 if t1EloDF.iat[0, 1] > t2EloDF.iat[0, 1]:
                     eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = (
-                        t1EloDF.at[0, "elo"] + 100
+                        t1EloDF.iat[0, 1] + 100
                     )
                 elif t1EloDF.iat[0, 1] == t2EloDF.iat[0, 1]:
                     eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = t1EloDF.iat[
@@ -32,7 +32,24 @@ def updateTeamElo(team1id, team2id=0, wld=0, init=False):
                     raise ValueError
 
             case 1:  # They lost
-                pass
+                t1EloDF = eloDF[eloDF["id"] == team1id]
+                t2EloDF = eloDF[eloDF["id"] == team2id]
+
+                if t1EloDF.iat[0, 1] < t2EloDF.iat[0, 1]:
+                    eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = (
+                        t1EloDF.iat[0, 1] - 100
+                    )
+                elif t1EloDF.iat[0, 1] == t2EloDF.iat[0, 1]:
+                    eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = t1EloDF.iat[
+                        0, 1
+                    ] - (t2EloDF.iat[0, 1] / 4)
+                elif t1EloDF.iat[0, 1] > t2EloDF.iat[0, 1]:
+                    eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = t1EloDF.iat[
+                        0, 1
+                    ] - (((t2EloDF.iat[0, 1] / 4) * 3) / 2)
+                else:
+                    raise ValueError
+
             case 2:  # They drew
                 pass
 
