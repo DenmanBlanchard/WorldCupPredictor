@@ -87,8 +87,7 @@ def updateElo(teamid, matchday):
                     pass
 
 
-def main_analyze(api_key):
-    # main_parse()
+def runScore():
     with open(os.path.join(os.path.abspath("data"), "teams.json"), "r") as file:
         teams = json.load(file)
         # Initialize elo
@@ -101,4 +100,23 @@ def main_analyze(api_key):
                 updateElo(team["id"], matchday + 1)
             tempDF = eloDF
 
-        print(tempDF)
+        highest_rows = tempDF[tempDF["elo"] == tempDF["elo"].max()]
+
+        highest_names = []
+        for name in range(len(highest_rows)):
+            highest_names.append("")
+
+        highest_rows.insert(loc=2, column="Name", value=highest_names)
+
+        for row in highest_rows:
+            for team in teams["teams"]:
+                highest_rows.loc[highest_rows.iloc[:, 0] == team["id"], "name"] = team[
+                    "name"
+                ]
+
+    return highest_rows
+
+
+def main_analyze(api_key):
+    # main_parse()
+    print(runScore())
