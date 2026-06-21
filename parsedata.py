@@ -4,6 +4,7 @@ import os
 import time
 
 import requests
+import tqdm
 from dotenv import load_dotenv
 
 import data.globals as glb
@@ -19,14 +20,18 @@ def getTeams():
 
 
 def getMatches(teamid):
-    with open(
-        os.path.join(os.path.abspath("data\\teams"), f"{teamid}.json"), "w"
-    ) as file:
-        json.dump(
-            getData(f"teams/{teamid}/matches?season=2026&competitions=2000,"),
-            file,
-            indent=4,
-        )
+    try:
+        with open(
+            os.path.join(os.path.abspath("data"), "teams", f"{teamid}.json"), "w"
+        ) as file:
+            json.dump(
+                getData(f"teams/{teamid}/matches?season=2026&competitions=2000,"),
+                file,
+                indent=4,
+            )
+    except Exception:
+        os.mkdir(os.path.join("data", "teams"))
+        getMatches(teamid)
 
 
 def getData(url_end="competitions", unfold_goals=False):
@@ -60,7 +65,7 @@ def getData(url_end="competitions", unfold_goals=False):
                     response.raise_for_status()
             except Exception as e:
                 if str(e).startswith("429"):
-                    print("Rate Limited")
+                    print(f"\r{'Rate Limited':<{glb.columns}}", end="", flush=True)
                     time.sleep(61.0)
                     glb.last_minute = math.floor(time.time() / 60)
                     glb.current_calls = 0
@@ -81,9 +86,16 @@ def getData(url_end="competitions", unfold_goals=False):
 
 
 def main_parse():
+    print("\nGetting team data")
     getTeams()
 
+    print("\nGetting match data for all the teams")
     with open(os.path.join(os.path.abspath("data"), "teams.json"), "r") as file:
         teams = json.load(file)
-        for team in teams["teams"]:
+        for team in tqdm.tqdm(
+            teams["teams"],
+            desc="Getting matches",
+            unit="match",
+            colour="blue",
+        ):
             getMatches(team["id"])

@@ -1,18 +1,23 @@
 import math
+import os
 import time
 
 global max_calls
 global current_calls
 global last_second
+global columns
+global lines
 
 max_calls = 8
 current_calls = 0
+
+columns, lines = os.get_terminal_size()
 
 
 last_minute = math.floor(time.time() / 60)
 
 
-def isAbleCall():
+def isAbleCall(tqdm=False):
     global current_calls, last_minute
 
     now = math.floor(time.time() / 60)
@@ -28,13 +33,22 @@ def isAbleCall():
 
     # reached max calls for this minute
     sleep_time = (math.floor(time.time()) - (last_minute * 60)) + 1
-    print(
-        f"Waiting for {sleep_time} seconds",
-        end="",
-        flush=True,
-    )
-    time.sleep((math.floor(time.time()) - (last_minute * 60)) + 1)
-    print(
-        f"\r{'Getting data / Continuing. Waited for ' + str(sleep_time) + ' seconds':<70}"
-    )
+
+    first_string = f"Waiting for {sleep_time} seconds"
+    second_string = f"Getting data / Continuing. Waited for {sleep_time} seconds"
+
+    if not tqdm:
+        print(
+            f"\r{first_string:<{columns}}",
+            end="",
+            flush=True,
+        )
+        time.sleep((math.floor(time.time()) - (last_minute * 60)) + 1)
+        print(
+            f"\r{second_string:<{columns}}",
+            end="",
+            flush=True,
+        )
+    else:
+        time.sleep((math.floor(time.time()) - (last_minute * 60)) + 1)
     return False
