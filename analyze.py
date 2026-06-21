@@ -101,4 +101,4 @@ def main_analyze(api_key):
                 updateElo(team["id"], matchday + 1)
             tempDF = eloDF
 
-        print(eloDF)
+        print(tempDF)
