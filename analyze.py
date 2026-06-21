@@ -3,18 +3,22 @@ import os
 
 import pandas as pd
 
+global tempDF
+
 startElo = 10000
 eloDF = pd.DataFrame(columns=["id", "elo"])
+tempDF = pd.DataFrame(columns=["id", "elo"])
 
 
 def updateTeamElo(team1id, team2id=0, wld=0, init=False):
     if init:
         eloDF.loc[len(eloDF)] = [team1id, startElo]
+        tempDF.loc[len(tempDF)] = [team1id, startElo]
     else:
         match wld:
             case 0:  # They won
-                t1EloDF = eloDF[eloDF["id"] == team1id]
-                t2EloDF = eloDF[eloDF["id"] == team2id]
+                t1EloDF = tempDF[tempDF["id"] == team1id]
+                t2EloDF = tempDF[tempDF["id"] == team2id]
 
                 if t1EloDF.iat[0, 1] > t2EloDF.iat[0, 1]:
                     eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = (
@@ -32,8 +36,8 @@ def updateTeamElo(team1id, team2id=0, wld=0, init=False):
                     raise ValueError
 
             case 1:  # They lost
-                t1EloDF = eloDF[eloDF["id"] == team1id]
-                t2EloDF = eloDF[eloDF["id"] == team2id]
+                t1EloDF = tempDF[tempDF["id"] == team1id]
+                t2EloDF = tempDF[tempDF["id"] == team2id]
 
                 if t1EloDF.iat[0, 1] < t2EloDF.iat[0, 1]:
                     eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = (
@@ -92,8 +96,9 @@ def main_analyze(api_key):
             updateTeamElo(team["id"], init=True)
 
         # Update elo
-        for team in teams["teams"]:
-            for matchday in range(teams["season"]["currentMatchday"] - 1):
+        for matchday in range(teams["season"]["currentMatchday"] - 1):
+            for team in teams["teams"]:
                 updateElo(team["id"], matchday + 1)
+            tempDF = eloDF
 
         print(eloDF)
