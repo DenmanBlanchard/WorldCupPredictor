@@ -3,6 +3,8 @@ import os
 
 import pandas as pd
 
+from parsedata import main_parse
+
 global tempDF
 
 startElo = 10000
@@ -118,5 +120,5 @@ def runScore():
 
 
 def main_analyze(api_key):
-    # main_parse()
+    main_parse()
     print(runScore())
