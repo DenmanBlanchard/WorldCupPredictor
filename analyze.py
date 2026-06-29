@@ -8,14 +8,14 @@ from parsedata import main_parse
 global tempDF
 
 startElo = 10000
-eloDF = pd.DataFrame(columns=["id", "elo"])
-tempDF = pd.DataFrame(columns=["id", "elo"])
+eloDF = pd.DataFrame(columns=["id", "elo", "matchday"])
+tempDF = pd.DataFrame(columns=["id", "elo", "matchday"])
 
 
-def updateTeamElo(team1id, team2id=0, wld=0, init=False):
+def updateTeamElo(team1id, matchday, team2id=0, wld=0, init=False):
     if init:
-        eloDF.loc[len(eloDF)] = [team1id, startElo]
-        tempDF.loc[len(tempDF)] = [team1id, startElo]
+        eloDF.loc[len(eloDF)] = [team1id, startElo, matchday]
+        tempDF.loc[len(tempDF)] = [team1id, startElo, matchday]
     else:
         match wld:
             case 0:  # They won
@@ -26,14 +26,17 @@ def updateTeamElo(team1id, team2id=0, wld=0, init=False):
                     eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = (
                         t1EloDF.iat[0, 1] + 100
                     )
+                    eloDF.loc[eloDF.iloc[:, 0] == team1id, "matchday"] = matchday
                 elif t1EloDF.iat[0, 1] == t2EloDF.iat[0, 1]:
                     eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = t1EloDF.iat[
                         0, 1
                     ] + (t2EloDF.iat[0, 1] / 2)
+                    eloDF.loc[eloDF.iloc[:, 0] == team1id, "matchday"] = matchday
                 elif t1EloDF.iat[0, 1] < t2EloDF.iat[0, 1]:
                     eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = t1EloDF.iat[
                         0, 1
                     ] + ((t2EloDF.iat[0, 1] / 4) * 3)
+                    eloDF.loc[eloDF.iloc[:, 0] == team1id, "matchday"] = matchday
                 else:
                     raise ValueError
 
@@ -45,19 +48,22 @@ def updateTeamElo(team1id, team2id=0, wld=0, init=False):
                     eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = (
                         t1EloDF.iat[0, 1] - 100
                     )
+                    eloDF.loc[eloDF.iloc[:, 0] == team1id, "matchday"] = matchday
                 elif t1EloDF.iat[0, 1] == t2EloDF.iat[0, 1]:
                     eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = t1EloDF.iat[
                         0, 1
                     ] - (t2EloDF.iat[0, 1] / 4)
+                    eloDF.loc[eloDF.iloc[:, 0] == team1id, "matchday"] = matchday
                 elif t1EloDF.iat[0, 1] > t2EloDF.iat[0, 1]:
                     eloDF.loc[eloDF.iloc[:, 0] == team1id, "elo"] = t1EloDF.iat[
                         0, 1
                     ] - (((t2EloDF.iat[0, 1] / 4) * 3) / 2)
+                    eloDF.loc[eloDF.iloc[:, 0] == team1id, "matchday"] = matchday
                 else:
                     raise ValueError
 
             case 2:  # They drew
-                pass
+                eloDF.loc[eloDF.iloc[:, 0] == team1id, "matchday"] = matchday
 
 
 def updateElo(teamid, matchday):
@@ -73,20 +79,24 @@ def updateElo(teamid, matchday):
                     match match["score"]["winner"]:
                         case "AWAY_TEAM":
                             if match["awayTeam"]["id"] == teamid:
-                                updateTeamElo(teamid, match["homeTeam"]["id"], 0)
+                                updateTeamElo(teamid, matchday, match["homeTeam"]["id"], 0)
                             else:
-                                updateTeamElo(teamid, match["homeTeam"]["id"], 1)
+                                updateTeamElo(teamid, matchday, match["homeTeam"]["id"], 1)
                         case "HOME_TEAM":
                             if match["homeTeam"]["id"] == teamid:
-                                updateTeamElo(teamid, match["awayTeam"]["id"], 0)
+                                updateTeamElo(teamid, matchday, match["awayTeam"]["id"], 0)
                             else:
-                                updateTeamElo(teamid, match["awayTeam"]["id"], 1)
+                                updateTeamElo(teamid, matchday, match["awayTeam"]["id"], 1)
                         case "DRAW":
                             updateTeamElo(
-                                match["awayTeam"]["id"], match["homeTeam"]["id"], 2
+                                match["awayTeam"]["id"], matchday, match["homeTeam"]["id"], 2
                             )
                 else:
                     pass
+
+def removeNonCurrentMatchday(matchday, df):
+
+    return df[df["matchday"] == matchday]
 
 
 def runScore():
@@ -94,7 +104,7 @@ def runScore():
         teams = json.load(file)
         # Initialize elo
         for team in teams["teams"]:
-            updateTeamElo(team["id"], init=True)
+            updateTeamElo(team["id"], matchday=0, init=True)
 
         # Update elo
         for matchday in range(teams["season"]["currentMatchday"] - 1):
@@ -115,6 +125,11 @@ def runScore():
                 highest_rows.loc[highest_rows.iloc[:, 0] == team["id"], "name"] = team[
                     "name"
                 ]
+        
+        # Remove non current matchdays
+        highest_rows = removeNonCurrentMatchday(teams["season"]["currentMatchday"] - 1, highest_rows)
+
+        print(tempDF.sort_values(by="elo"))
 
     return highest_rows
 
