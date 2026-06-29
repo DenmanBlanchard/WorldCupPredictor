@@ -86,16 +86,19 @@ def getData(url_end="competitions", unfold_goals=False):
 
 
 def main_parse():
-    print("\nGetting team data")
-    getTeams()
+    if glb.check_internet():
+        print("\nGetting team data")
+        getTeams()
 
-    print("\nGetting match data for all the teams")
-    with open(os.path.join(os.path.abspath("data"), "teams.json"), "r") as file:
-        teams = json.load(file)
-        for team in tqdm.tqdm(
-            teams["teams"],
-            desc="Getting matches",
-            unit="match",
-            colour="blue",
-        ):
-            getMatches(team["id"])
+        print("\nGetting match data for all the teams")
+        with open(os.path.join(os.path.abspath("data"), "teams.json"), "r") as file:
+            teams = json.load(file)
+            for team in tqdm.tqdm(
+                teams["teams"],
+                desc="Getting matches",
+                unit="match",
+                colour="blue",
+            ):
+                getMatches(team["id"])
+    else:
+        print("Internet connection failed for some reason")
