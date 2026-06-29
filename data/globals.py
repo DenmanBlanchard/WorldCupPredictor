@@ -20,11 +20,12 @@ last_minute = math.floor(time.time() / 60)
 
 
 def isAbleCall(tqdm=False):
-    
+
     if checkRate():
         return True
-        
+
     return False
+
 
 def checkRate():
     global current_calls, last_minute
@@ -60,8 +61,7 @@ def checkRate():
         )
     else:
         time.sleep((math.floor(time.time()) - (last_minute * 60)) + 1)
-    
-    
+
     return False
 
 
@@ -70,7 +70,6 @@ def check_internet():
     current_os = platform.system().lower()
 
     if current_os == "windows":
-
         command = "ping -n 1 -w 1000 1.1.1.1 > nul 2>&1"
 
     else:
@@ -78,4 +77,4 @@ def check_internet():
 
     response = os.system(command)
 
-    return response == 0    
+    return response == 0
