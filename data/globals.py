@@ -21,7 +21,9 @@ last_minute = math.floor(time.time() / 60)
 
 def isAbleCall(tqdm=False):
     
-    if checkRate():
+    rateCheck = checkRate()
+
+    if rateCheck:
         return True
         
     return False
