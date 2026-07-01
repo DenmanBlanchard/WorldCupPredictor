@@ -79,20 +79,32 @@ def updateElo(teamid, matchday):
                     match match["score"]["winner"]:
                         case "AWAY_TEAM":
                             if match["awayTeam"]["id"] == teamid:
-                                updateTeamElo(teamid, matchday, match["homeTeam"]["id"], 0)
+                                updateTeamElo(
+                                    teamid, matchday, match["homeTeam"]["id"], 0
+                                )
                             else:
-                                updateTeamElo(teamid, matchday, match["homeTeam"]["id"], 1)
+                                updateTeamElo(
+                                    teamid, matchday, match["homeTeam"]["id"], 1
+                                )
                         case "HOME_TEAM":
                             if match["homeTeam"]["id"] == teamid:
-                                updateTeamElo(teamid, matchday, match["awayTeam"]["id"], 0)
+                                updateTeamElo(
+                                    teamid, matchday, match["awayTeam"]["id"], 0
+                                )
                             else:
-                                updateTeamElo(teamid, matchday, match["awayTeam"]["id"], 1)
+                                updateTeamElo(
+                                    teamid, matchday, match["awayTeam"]["id"], 1
+                                )
                         case "DRAW":
                             updateTeamElo(
-                                match["awayTeam"]["id"], matchday, match["homeTeam"]["id"], 2
+                                match["awayTeam"]["id"],
+                                matchday,
+                                match["homeTeam"]["id"],
+                                2,
                             )
                 else:
                     pass
+
 
 def removeNonCurrentMatchday(matchday, df):
 
@@ -125,9 +137,11 @@ def runScore():
                 highest_rows.loc[highest_rows.iloc[:, 0] == team["id"], "name"] = team[
                     "name"
                 ]
-        
+
         # Remove non current matchdays
-        highest_rows = removeNonCurrentMatchday(teams["season"]["currentMatchday"] - 1, highest_rows)
+        highest_rows = removeNonCurrentMatchday(
+            teams["season"]["currentMatchday"] - 1, highest_rows
+        )
 
         print(tempDF.sort_values(by="elo"))
 
